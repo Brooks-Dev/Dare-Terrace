@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -18,6 +19,9 @@ public class Player : MonoBehaviour
     private Vector3 _playerVelocity;
     private int _coins;
     private UIManager _uiManager;
+    private int _lives =  3;
+    [SerializeField]
+    private Transform _respawn;
     
     // Start is called before the first frame update
     void Start()
@@ -32,6 +36,8 @@ public class Player : MonoBehaviour
         {
             Debug.LogError("Character Controller is null in Player");
         }
+
+        _uiManager.UpdateLives(_lives);
     }
 
     // Update is called once per frame
@@ -73,5 +79,25 @@ public class Player : MonoBehaviour
     {
         _coins++;
         _uiManager.UpdateCoins(_coins);
+    }
+
+    public void PlayerDies()
+    {
+        CharacterController controller = GetComponent<CharacterController>();
+        if (controller != null)
+        {
+            controller.enabled = false;
+            gameObject.transform.position = _respawn.position;
+            controller.enabled = true;
+        }
+        _lives--;
+        if (_lives < 1)
+        {
+            SceneManager.LoadScene(0);
+        }
+        else
+        {
+            _uiManager.UpdateLives(_lives);
+        }
     }
 }
